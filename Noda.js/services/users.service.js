@@ -18,7 +18,8 @@ async function getUsers() {
 
 async function getUserById(userId) {
     try {
-        return await User.findById(userId);
+        console.log(userId)
+        return User.findById(userId);
     } catch (err) {
         throw err;
     }

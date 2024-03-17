@@ -4,7 +4,7 @@ const { userByIdValidation } = require('../middlewares/users.middleware');
 
 async function createUser(req, res, next) {
     try {
-        const newUser = await userService.create(req.body);
+        const newUser = await userService.createUser(req.body);
         res.status(200).json({
             status: 200,
             data: newUser,
@@ -18,7 +18,7 @@ async function getUsers(req, res, next) {
     try {
         res.status(200).json({
             status: 200,
-            data: await userService.find(req.query),
+            data: await userService.getUsers(req.query),
         });
     } catch(err) {
         next(createError.InternalServerError(err.message));
@@ -28,7 +28,7 @@ async function getUsers(req, res, next) {
 async function getUser(req, res, next) {
     try {
         const { userId } = req.params;
-        const user = await userService.findById(userId);
+        const user = await userService.getUserById(userId);
 
         if (!user) {
             return res.status(400).json({
@@ -52,7 +52,7 @@ async function updateUser(req, res, next) {
     try {
         const { userId } = req.params;
         const userData = req.body;
-        await userService.findByIdAndUpdate(userId, userData);
+        await userService.updateUser(userId, userData);
 
         res.status(200).json({
             status: 200,
@@ -65,7 +65,7 @@ async function updateUser(req, res, next) {
 async function deleteUser(req, res, next) {
     try {
         const { userId } = req.params;
-        await userService.findByIdAndDelete(userId);
+        await userService.deleteUser(userId);
 
         res.status(200).json({
             status: 200,
