@@ -1,9 +1,9 @@
-const userService = require('../services/users.service');
+const User = require('../models/user.model');
 
 async function createUser(req, res) {
     try {
-        const newUser = await userService.create(req.body);
-        res.status(200).json({ status: 200, data: newUser });
+        const newUser = await User.create(req.body);
+        res.status(201).json({ status: 201, data: newUser });
     } catch (err) {
         console.error(err);
         res.status(500).json({ status: 500, error: err });
@@ -12,7 +12,7 @@ async function createUser(req, res) {
 
 async function getUsers(req, res) {
     try {
-        const users = await userService.find(req.query);
+        const users = await User.find();
         res.status(200).json({ status: 200, data: users });
     } catch (err) {
         console.error(err);
@@ -22,9 +22,9 @@ async function getUsers(req, res) {
 
 async function getUser(req, res) {
     try {
-        const user = await userService.findById(req.params.userId);
+        const user = await User.findById(req.params.userId);
         if (!user) {
-            return res.status(400).json({ status: 400, message: 'User not found.' });
+            return res.status(404).json({ status: 404, message: 'User not found.' });
         }
         res.status(200).json({ status: 200, data: user });
     } catch (err) {
@@ -35,8 +35,11 @@ async function getUser(req, res) {
 
 async function updateUser(req, res) {
     try {
-        await userService.update(req.params.userId, req.body);
-        res.status(200).json({ status: 200 });
+        const updatedUser = await User.findByIdAndUpdate(req.params.userId, req.body, { new: true });
+        if (!updatedUser) {
+            return res.status(404).json({ status: 404, message: 'User not found.' });
+        }
+        res.status(200).json({ status: 200, data: updatedUser });
     } catch (err) {
         console.error(err);
         res.status(500).json({ status: 500, error: err });
@@ -45,7 +48,10 @@ async function updateUser(req, res) {
 
 async function deleteUser(req, res) {
     try {
-        await userService.remove(req.params.userId);
+        const deletedUser = await User.findByIdAndDelete(req.params.userId);
+        if (!deletedUser) {
+            return res.status(404).json({ status: 404, message: 'User not found.' });
+        }
         res.status(200).json({ status: 200 });
     } catch (err) {
         console.error(err);

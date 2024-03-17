@@ -1,16 +1,19 @@
+const mongoose = require('mongoose');
 const express = require('express');
+const { port, mongodb_uri } = require('./config');
 const usersRouter = require('./routes/users.route');
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+mongoose.connect(mongodb_uri)
+  .then(() => {
+    console.log('Mongo DB connected');
+  });
 
-// Middleware для обробки JSON-даних
+const app = express();
+
 app.use(express.json());
 
-// Маршрути для користувачів
 app.use('/users', usersRouter);
 
-// Запуск сервера
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`);
 });
