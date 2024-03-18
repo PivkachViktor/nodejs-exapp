@@ -1,68 +1,84 @@
-const User = require('../models/user.model');
+const userService = require('../services/users.service');
+const createError = require('http-errors');
+const { userByIdValidation } = require('../middlewares/users.middleware');
 
-async function createUser(req, res) {
+async function createUser(req, res, next) {
     try {
-        const newUser = await User.create(req.body);
-        res.status(201).json({ status: 201, data: newUser });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ status: 500, error: err });
+        const newUser = await userService.createUser(req.body);
+        res.status(200).json({
+            status: 200,
+            data: newUser,
+        });
+    } catch(err) {
+        next(createError.InternalServerError(err.message));
     }
-}
+};
 
-async function getUsers(req, res) {
+async function getUsers(req, res, next) {
     try {
-        const users = await User.find();
-        res.status(200).json({ status: 200, data: users });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ status: 500, error: err });
+        res.status(200).json({
+            status: 200,
+            data: await userService.getUsers(req.query),
+        });
+    } catch(err) {
+        next(createError.InternalServerError(err.message));
     }
-}
+};
 
-async function getUser(req, res) {
+async function getUser(req, res, next) {
     try {
-        const user = await User.findById(req.params.userId);
+        const { userId } = req.params;
+        const user = await userService.getUserById(userId);
+
         if (!user) {
-            return res.status(404).json({ status: 404, message: 'User not found.' });
+            return res.status(400).json({
+                status: 400,
+                error: {
+                    message: 'User not found.'
+                },
+            });
         }
-        res.status(200).json({ status: 200, data: user });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ status: 500, error: err });
-    }
-}
 
-async function updateUser(req, res) {
-    try {
-        const updatedUser = await User.findByIdAndUpdate(req.params.userId, req.body, { new: true });
-        if (!updatedUser) {
-            return res.status(404).json({ status: 404, message: 'User not found.' });
-        }
-        res.status(200).json({ status: 200, data: updatedUser });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ status: 500, error: err });
+        res.status(200).json({
+            status: 200,
+            data: user,
+        });
+    } catch(err) {
+        next(createError.InternalServerError(err.message));
     }
-}
+};
 
-async function deleteUser(req, res) {
+async function updateUser(req, res, next) {
     try {
-        const deletedUser = await User.findByIdAndDelete(req.params.userId);
-        if (!deletedUser) {
-            return res.status(404).json({ status: 404, message: 'User not found.' });
-        }
-        res.status(200).json({ status: 200 });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ status: 500, error: err });
+        const { userId } = req.params;
+        const userData = req.body;
+        await userService.updateUser(userId, userData);
+
+        res.status(200).json({
+            status: 200,
+        });
+    } catch(err) {
+        next(createError.InternalServerError(err.message));
     }
-}
+};
+
+async function deleteUser(req, res, next) {
+    try {
+        const { userId } = req.params;
+        await userService.deleteUser(userId);
+
+        res.status(200).json({
+            status: 200,
+        });
+    } catch(err) {
+        next(createError.InternalServerError(err.message));
+    }
+};
 
 module.exports = {
     createUser,
     getUsers,
     getUser,
     updateUser,
-    deleteUser
+    deleteUser,
 };
