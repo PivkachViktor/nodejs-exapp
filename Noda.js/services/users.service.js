@@ -1,7 +1,14 @@
 const User = require('../models/user.model');
+const { UserCreateSchema, UserUpdateSchema } = require('../joi_validation_schemas/users.schemas');
+const createError = require('http-errors');
 
 async function createUser(userData) {
     try {
+        const { error } = UserCreateSchema.validate(userData);
+        if (error) {
+            throw createError.BadRequest(error.details[0].message);
+        }
+
         return await User.create(userData);
     } catch (err) {
         throw err;
@@ -26,6 +33,11 @@ async function getUserById(userId) {
 
 async function updateUser(userId, userData) {
     try {
+        const { error } = UserUpdateSchema.validate(userData);
+        if (error) {
+            throw createError.BadRequest(error.details[0].message);
+        }
+
         return await User.findByIdAndUpdate(userId, userData, { new: true });
     } catch (err) {
         throw err;
