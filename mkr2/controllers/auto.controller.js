@@ -34,6 +34,65 @@ async function getAutos(req, res) {
     }
 };
 
+async function getAuto(req, res) {
+    try {
+        const { id } = req.params;
+        const auto = await autoService.findById(id);
+
+        if (!auto) {
+            return res.status(400).json({
+                status: 400,
+                message: 'Halereya not found.',
+            });
+        }
+
+        res.status(200).json({
+            status: 200,
+            data: auto,
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            status: 500,
+            error: err,
+        });
+    }
+};
+
+async function updateAuto(req, res) {
+    try {
+        const { id } = req.params;
+        const autoData = req.body;
+        await autoService.findByIdAndUpdate(id, autoData);
+
+        res.status(200).json({
+            status: 200,
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            status: 500,
+            error: err,
+        });
+    }
+};
+
+async function deleteAuto(req, res) {
+    try {
+        const { id } = req.params;
+        await autoService.findByIdAndDelete(id);
+
+        res.status(200).json({
+            status: 200,
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            status: 500,
+            error: err,
+        });
+    }
+};
 
 async function createAutoFromJSONFile(req, res) {
     try {
@@ -64,6 +123,8 @@ async function createAutoFromJSONFile(req, res) {
 module.exports = {
     createAuto,
     getAutos,
-    
+    getAuto,
+    updateAuto,
+    deleteAuto,
     createAutoFromJSONFile,
 };
