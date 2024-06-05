@@ -5,7 +5,8 @@ const employeeSchema = new mongoose.Schema({
     roomNumber: { type: String, required: true },
     department: { type: String, required: true },
     computerBrand: { type: String, required: true },
-    password: {type: String,} 
+    password: {type: String,},
+    profilePicture: {type: String,} 
 });
 
 const Employee = mongoose.model('Employee', employeeSchema);

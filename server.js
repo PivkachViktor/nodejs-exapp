@@ -5,6 +5,7 @@ const { port, mongodb_uri } = require('./config');
 const authRouter = require('./routes/auth.route');
 const usersRouter = require('./routes/users.route');
 const { authenticationCheck } = require('./middlewares/auth.middleware');
+const multer = require('multer');
 
 mongoose.connect(mongodb_uri)
   .then(() => {
@@ -14,7 +15,7 @@ mongoose.connect(mongodb_uri)
 const app = express();
 
 
-app.use(express.json());
+app.use(express.static('public'));
 
 
 app.use((req, res, next) => {
@@ -41,6 +42,16 @@ app.use('/users', usersRouter);
 
 app.use((req, res, next) => {
   next(createError.NotFound());
+});
+
+app.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      throw createError.BadRequest('File size limit exceeded. Please upload a smaller file.');
+    }
+  }
+
+  next(err);
 });
 
 app.use((err, req, res, next) => {
