@@ -10,7 +10,7 @@ async function userByIdValidation(req, res, next) {
             throw createError.BadRequest("User id is not valid");
         }
 
-        const user = await userService.findById(userId);
+        const user = await userService.getUserById(userId);
 
         if (!user) {
             throw createError.NotFound("User with such id not found");
